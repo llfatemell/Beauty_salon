@@ -5,13 +5,9 @@ from datetime import datetime
 
 Base = declarative_base()
 
-
-class Admin(Base):
-    __tablename__ = 'admins'
+class Holiday(Base):
+    __tablename__ = 'holidays'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    full_name = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    is_active = Column(Integer, default=1)
+    holiday_date = Column(String, unique=True, nullable=False)   # DATE
+    description = Column(Text)

@@ -1,26 +1,36 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
 from typing import Optional
 
-
 class CustomerBase(BaseModel):
-    name: str
-    email: str
-    phone: str = ""
-
+    first_name: str
+    last_name: str
+    phone_number: str
+    email: Optional[EmailStr] = None
+    birth_date: Optional[str] = None
+    gender: Optional[str] = None
+    address: Optional[str] = None
+    notes: Optional[str] = None
 
 class CustomerCreate(CustomerBase):
-    pass
-
+    password: str
 
 class CustomerUpdate(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
-
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    birth_date: Optional[str] = None
+    gender: Optional[str] = None
+    address: Optional[str] = None
+    notes: Optional[str] = None
 
 class CustomerResponse(CustomerBase):
     id: int
-    order_count: int = 0
+    register_date: datetime
+    total_visits: int
+    phone_verified: int
+    is_active: int
+    last_login: Optional[datetime] = None
 
     class Config:
         from_attributes = True
