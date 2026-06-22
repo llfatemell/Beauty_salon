@@ -1,15 +1,48 @@
 <template>
-  <div class="card" style="max-width:500px; margin:0 auto;">
-    <div class="card-header"><i :class="'fas '+(isEdit?'fa-pen':'fa-plus')"></i> {{ isEdit ? 'Edit Customer' : 'Add Customer' }}</div>
+  <div class="card" style="max-width: 520px; margin: 2rem auto;">
+    <div class="card-header">
+      <i :class="'fas ' + (isEdit ? 'fa-pen' : 'fa-plus')"></i>
+      {{ isEdit ? 'ویرایش مشتری' : 'مشتری جدید' }}
+    </div>
     <div class="card-body">
-      <div v-if="error" class="error-msg">{{ error }}</div>
+      <div v-if="error" class="error-msg">
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
+      </div>
+
       <form @submit.prevent="doSave">
-        <div class="form-group"><label>Name</label><input v-model="form.name" required /></div>
-        <div class="form-group"><label>Email</label><input v-model="form.email" type="email" required /></div>
-        <div class="form-group"><label>Phone</label><input v-model="form.phone" /></div>
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary" :disabled="saving"><i class="fas fa-save"></i> {{ saving ? 'Saving...' : (isEdit ? 'Update' : 'Create') }}</button>
-          <router-link to="/customers" class="btn btn-secondary">Cancel</router-link>
+        <div class="form-group">
+          <label>نام و نام خانوادگی <span class="text-danger">*</span></label>
+          <input v-model="form.name" type="text" required />
+        </div>
+
+        <div class="form-group">
+          <label>شماره تلفن <span class="text-danger">*</span></label>
+          <input v-model="form.phone_number" type="tel" required />
+        </div>
+
+        <div class="form-group">
+          <label>آدرس</label>
+          <textarea v-model="form.address" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>یادداشت‌ها</label>
+          <textarea v-model="form.notes" rows="3" placeholder="توضیحات اضافی..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            :disabled="saving"
+            style="flex: 1;"
+          >
+            <i class="fas fa-save"></i>
+            {{ saving ? 'در حال ذخیره...' : (isEdit ? 'به‌روزرسانی' : 'ثبت مشتری') }}
+          </button>
+          <router-link to="/customers" class="btn btn-secondary" style="flex: 1;">
+            انصراف
+          </router-link>
         </div>
       </form>
     </div>
@@ -18,26 +51,60 @@
 
 <script>
 import api from '../api.js'
+
 export default {
-  data() { return { isEdit: false, saving: false, error: null, form: { name: '', email: '', phone: '' } } },
+  name: 'CustomerForm',
+  data() {
+    return {
+      isEdit: false,
+      saving: false,
+      error: null,
+      form: {
+        name: '',
+        phone_number: '',
+        address: '',
+        notes: ''
+      }
+    }
+  },
   async created() {
-    const id = this.$route.params.id; this.isEdit = !!id
+    const id = this.$route.params.id
+    this.isEdit = !!id
+
     if (id) {
-      const res = await api.customers({ per_page: 100 })
-      const c = (res.customers || []).find(x => x.id == id)
-      if (c) this.form = { name: c.name, email: c.email, phone: c.phone }
+      try {
+        const customer = await api.customer(id)
+        this.form = {
+          name: customer.name || '',
+          phone_number: customer.phone_number || '',
+          address: customer.address || '',
+          notes: customer.notes || ''
+        }
+      } catch (e) {
+        this.error = 'خطا در دریافت اطلاعات مشتری'
+        console.error(e)
+      }
     }
   },
   methods: {
     async doSave() {
-      this.saving = true; this.error = null
+      this.saving = true
+      this.error = null
+
       try {
-        if (this.isEdit) await api.updateCustomer(this.$route.params.id, this.form)
-        else await api.createCustomer(this.form)
+        if (this.isEdit) {
+          await api.updateCustomer(this.$route.params.id, this.form)
+        } else {
+          await api.createCustomer(this.form)
+        }
+
         this.$router.push('/customers')
-      } catch (e) { this.error = e.message }
-      finally { this.saving = false }
-    },
-  },
+      } catch (e) {
+        this.error = e.message || 'خطا در ذخیره اطلاعات'
+      } finally {
+        this.saving = false
+      }
+    }
+  }
 }
 </script>

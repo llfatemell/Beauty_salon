@@ -6,99 +6,175 @@ async function request(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
   })
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(err.detail || `HTTP ${res.status}`)
+    throw new Error(err.detail || err.message || `HTTP ${res.status}`)
   }
   return res.json()
 }
 
 export default {
-  // Auth
+  // ==================== Auth ====================
   login(username, password) {
     return request('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     })
   },
+
   logout() {
     return request('/api/auth/logout', { method: 'POST' })
   },
+
   me() {
     return request('/api/auth/me')
   },
 
-  // Dashboard
+  // ==================== Dashboard ====================
   dashboard() {
     return request('/api/dashboard')
   },
 
-  // Products
-  products(params = {}) {
-    const q = new URLSearchParams(params).toString()
-    return request(`/api/products?${q}`)
-  },
-  product(id) {
-    return request(`/api/products/${id}`)
-  },
-  createProduct(data) {
-    return request('/api/products', { method: 'POST', body: JSON.stringify(data) })
-  },
-  updateProduct(id, data) {
-    return request(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(data) })
-  },
-  patchProduct(id, data) {
-    return request(`/api/products/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
-  },
-  deleteProduct(id) {
-    return request(`/api/products/${id}`, { method: 'DELETE' })
-  },
-
-  // Categories
-  categories(params = {}) {
-    const q = new URLSearchParams(params).toString()
-    return request(`/api/categories?${q}`)
-  },
-  createCategory(data) {
-    return request('/api/categories', { method: 'POST', body: JSON.stringify(data) })
-  },
-  updateCategory(id, data) {
-    return request(`/api/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) })
-  },
-  deleteCategory(id) {
-    return request(`/api/categories/${id}`, { method: 'DELETE' })
-  },
-
-  // Customers
+  // ==================== Customers ====================
   customers(params = {}) {
     const q = new URLSearchParams(params).toString()
     return request(`/api/customers?${q}`)
   },
+
+  customer(id) {
+    return request(`/api/customers/${id}`)
+  },
+
   createCustomer(data) {
-    return request('/api/customers', { method: 'POST', body: JSON.stringify(data) })
+    return request('/api/customers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
+
   updateCustomer(id, data) {
-    return request(`/api/customers/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+    return request(`/api/customers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
   },
+
+  patchCustomer(id, data) {
+    return request(`/api/customers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  },
+
   deleteCustomer(id) {
     return request(`/api/customers/${id}`, { method: 'DELETE' })
   },
 
-  // Orders
-  orders(params = {}) {
+  // ==================== Lines (Services) ====================
+  lines(params = {}) {
     const q = new URLSearchParams(params).toString()
-    return request(`/api/orders?${q}`)
+    return request(`/api/lines?${q}`)
   },
-  order(id) {
-    return request(`/api/orders/${id}`)
+
+  line(id) {
+    return request(`/api/lines/${id}`)
   },
-  createOrder(data) {
-    return request('/api/orders', { method: 'POST', body: JSON.stringify(data) })
+
+  createLine(data) {
+    return request('/api/lines', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
-  updateOrderStatus(id, status) {
-    return request(`/api/orders/${id}/status`, {
+
+  updateLine(id, data) {
+    return request(`/api/lines/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  patchLine(id, data) {
+    return request(`/api/lines/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  },
+
+  deleteLine(id) {
+    return request(`/api/lines/${id}`, { method: 'DELETE' })
+  },
+
+  // ==================== Reservations ====================
+  reservations(params = {}) {
+    const q = new URLSearchParams(params).toString()
+    return request(`/api/reservations?${q}`)
+  },
+
+  reservation(id) {
+    return request(`/api/reservations/${id}`)
+  },
+
+  createReservation(data) {
+    return request('/api/reservations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  updateReservation(id, data) {
+    return request(`/api/reservations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  updateReservationStatus(id, status) {
+    return request(`/api/reservations/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     })
+  },
+
+  // Available Slots (برای فرم رزرو)
+  availableSlots(line_id = null) {
+    const params = line_id ? `?line_id=${line_id}` : ''
+    return request(`/api/reservations/available-slots${params}`)
+  },
+
+  // ==================== Schedules (Work Schedules) ====================
+  schedules(params = {}) {
+    const q = new URLSearchParams(params).toString()
+    return request(`/api/schedules?${q}`)
+  },
+
+  schedule(id) {
+    return request(`/api/schedules/${id}`)
+  },
+
+  createSchedule(data) {
+    return request('/api/schedules', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  updateSchedule(id, data) {
+    return request(`/api/schedules/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  patchSchedule(id, data) {
+    return request(`/api/schedules/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  },
+
+  deleteSchedule(id) {
+    return request(`/api/schedules/${id}`, { method: 'DELETE' })
   },
 }

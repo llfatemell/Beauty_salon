@@ -1,20 +1,24 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class LineBase(BaseModel):
-    name: str
+    name_line: str
     duration_minutes: int = 60
-    price: float = 0.0
-    is_active: int = 1
+    price: float
+    name_service: str
+
 
 class LineCreate(LineBase):
     pass
 
+
 class LineUpdate(BaseModel):
-    name: Optional[str] = None
+    name_line: Optional[str] = None
     duration_minutes: Optional[int] = None
     price: Optional[float] = None
-    is_active: Optional[int] = None
+    name_service: Optional[str] = None
+
 
 class LineResponse(LineBase):
     id: int

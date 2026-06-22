@@ -1,9 +1,7 @@
-from app.models.admin import admin
-from app.models.customer import Customer
-from app.models.serviceline import Serviceline
-from app.models.reservation import Reservation
-from app.models.Holiday import holiday
-from app.models.WorkSchedule import workSchedule
+from app.models.Admin import Admin
+from app.models.Customer import Customer
+from app.models.Line import Line
+from app.models.Reservation import Reservation
+from app.models.WorkSchedule import WorkSchedule
 
-__all__ = ["admin", "Customer", "Serviceline" , "Reservation", "holiday" , "workSchedule"]
- 
+__all__ = ["Admin", "Customer", "Line", "Reservation", "WorkSchedule"]

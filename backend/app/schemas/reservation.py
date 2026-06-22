@@ -1,27 +1,48 @@
 from pydantic import BaseModel
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
 
-class ReservationBase(BaseModel):
+
+class ReservationCreate(BaseModel):
     line_id: int
-    reservation_date: datetime
-    duration_minutes: Optional[int] = None
-    total_price: Optional[float] = None
+    customer_id: int
+    schedule_id: int
+    status: str = "confirmed"          # وضعیت پیش‌فرض
 
-class ReservationCreate(ReservationBase):
-    customer_id: int   
 
 class ReservationUpdate(BaseModel):
-    reservation_date: Optional[datetime] = None
-    status: Optional[str] = None   # 'confirmed', 'cancelled', 'completed'
+    line_id: Optional[int] = None
+    customer_id: Optional[int] = None
+    schedule_id: Optional[int] = None
+    status: Optional[str] = None
 
-class ReservationResponse(ReservationBase):
-    id: int
-    reservation_code: str
-    customer_id: int
+
+class ReservationStatusUpdate(BaseModel):
+    """آپدیت فقط وضعیت (ساده‌تر)"""
     status: str
-    created_at: datetime
-    end_time: Optional[datetime] = None
+
+
+class ReservationResponse(BaseModel):
+    id: int
+    
+    # Foreign Keys
+    line_id: int
+    customer_id: int
+    schedule_id: int
+
+    # اطلاعات غنی شده از جداول مرتبط
+    name_line: Optional[str] = None
+    name_service: Optional[str] = None
+    price: float
+
+
+    customer_name: Optional[str] = None
+    
+    # اطلاعات زمانی
+    weekday: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    status: Optional[str] = None
 
     class Config:
         from_attributes = True
